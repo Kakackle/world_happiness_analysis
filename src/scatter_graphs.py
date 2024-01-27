@@ -5,6 +5,8 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as graph_objects
 
+from skimage import io
+
 from dataframes import (
     df,
     metric_graph_columns
@@ -29,15 +31,50 @@ metric_vs_ladder_controls = dbc.Card(
     body=True,
 )
 
+metric_ex_img = io.imread('../results/example_metric_ladder.png')
+metric_ex_fig = px.imshow(metric_ex_img)
+
 metric_vs_ladder_container = dbc.Container([
-    html.H1(children = 'Chosen metric vs ladder score', style={'textAlign': 'center'}),
-    html.P(id='metric-vs-ladder-test'),
+    html.H2(children = 'Chosen metric vs ladder score', style={'textAlign': 'center'}),
+    # html.P(id='metric-vs-ladder-test'),
     dbc.Row(
         [
-            dbc.Col(metric_vs_ladder_controls, md=4),
+            dbc.Col(
+                html.Div([
+                    metric_vs_ladder_controls,
+                    html.P(children="The graph presents the relation between any of the chosen \
+                            numerical metrics and the ladder score for each country, colored by region, \
+                            hopefully exposing some correlations, but also the difference between regions, \
+                            general trends etc")
+                ]),md=4
+                ),
             dbc.Col(dcc.Graph(id='metric-vs-ladder-graph'), md=8),
         ],
         align="center",
+    ),
+    dbc.Row(
+        [
+            dbc.Col(
+                html.Div(
+                    [
+                        dcc.Graph(figure = metric_ex_fig),
+                        html.P(children = "Example 1 - visible division by regions \
+                                that could imply a relation of lower agriculture to higher ladder")
+                    ]
+                ), md=6
+            ),
+            dbc.Col(
+                html.Div(
+                    [
+                        dcc.Graph(figure = metric_ex_fig),
+                        html.P(children = "Example 2 - visible division by regions \
+                                that could imply a relation of lower agriculture to higher ladder")
+                    ]
+                ), md=6
+            )
+
+        ],
+        align='center'
     ),
 ], fluid=True)
 
@@ -45,7 +82,7 @@ def get_metric_vs_ladder_callbacks(app):
     @app.callback(
         [
             Output('metric-vs-ladder-graph', 'figure'),
-            Output('metric-vs-ladder-test', 'children')
+            # Output('metric-vs-ladder-test', 'children')
         ],
         [
             Input('metric-vs-ladder-selection', 'value'),
@@ -53,8 +90,14 @@ def get_metric_vs_ladder_callbacks(app):
     )
     def update_metric_vs_ladder_graph(metric):
         fig = px.scatter(df, y='Ladder score', x=metric, hover_data='Country', color='Regional Indicator',)
-        return fig, f'metric: {metric}'
-        # return fig
+        # return fig, f'metric: {metric}'
+        fig.update_layout(legend=dict(
+            orientation = "h",
+            # yanchor = "bottom",
+            # xanchor = "right"
+            y=-1,
+        ))
+        return [fig,]
     
 
 # ---------------------------------------------------------------------------- #
@@ -76,8 +119,8 @@ metric_vs_life_controls = dbc.Card(
 )
 
 metric_vs_life_container = dbc.Container([
-    html.H1(children = 'Chosen metric vs life expectancy', style={'textAlign': 'center'}),
-    html.P(id='metric-vs-life-test'),
+    html.H2(children = 'Chosen metric vs life expectancy', style={'textAlign': 'center'}),
+    # html.P(id='metric-vs-life-test'),
     dbc.Row(
         [
             dbc.Col(metric_vs_life_controls, md=4),
@@ -91,7 +134,7 @@ def get_metric_vs_life_callbacks(app):
     @app.callback(
         [
             Output('metric-vs-life-graph', 'figure')
-            ,Output('metric-vs-life-test', 'children')
+            # ,Output('metric-vs-life-test', 'children')
         ],
         [
             Input('metric-vs-life-selection', 'value'),
@@ -99,8 +142,8 @@ def get_metric_vs_life_callbacks(app):
     )
     def update_metric_vs_life_graph(metric):
         fig = px.scatter(df, y='Life expectancy', x=metric, hover_data='Country', color='Regional Indicator')
-        return fig, f'metric: {metric}'
-        # return fig
+        # return fig, f'metric: {metric}'
+        return [fig,]
 
 
 # ---------------------------------------------------------------------------- #
@@ -141,8 +184,8 @@ region_xy_controls = dbc.Card(
 )
 
 region_xy_container = dbc.Container([
-    html.H1(children = 'Within region two metric choosable scatter for countries within chosen region', style={'textAlign': 'center'}),
-    html.P(id='region-xy-test'),
+    html.H2(children = 'Within region two metric choosable scatter for countries within chosen region', style={'textAlign': 'center'}),
+    # html.P(id='region-xy-test'),
     dbc.Row(
         [
             dbc.Col(region_xy_controls, md=4),
@@ -156,7 +199,7 @@ def get_region_xy_callbacks(app):
     @app.callback(
         [
             Output('region-xy-graph', 'figure'),
-            Output('region-xy-test', 'children'),
+            # Output('region-xy-test', 'children'),
         ],
         [
             Input('region-region-selection', 'value'),
@@ -168,5 +211,5 @@ def get_region_xy_callbacks(app):
         region_df = df[df['Regional Indicator'] == region]
         fig = px.scatter(region_df, y=metric_y, x=metric_x, hover_data='Country', color='Regional Indicator',
                         trendline = 'ols')
-        return fig, f'region df shape: {region_df.shape}'
-        # return fig
+        # return fig, f'region df shape: {region_df.shape}'
+        return [fig,]

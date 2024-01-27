@@ -90,7 +90,8 @@ for fig_index in range(len_static//2):
     static_figures_rows.append(static_figures_row)
 
 static_figures_container = dbc.Container([
-    html.H1(children = 'Static figures', style={'textAlign': 'center'}),
+    html.H1(children = 'Static figures', style={'textAlign': 'center'},
+            id='static-figures'),
     # html.P(id='region-xy-test'),
     *static_figures_rows,
 ], fluid=True)
@@ -105,8 +106,8 @@ len_static = len(static_figures_size)
 for fig_index in range(len_static//2):
     static_figures_row = dbc.Row(
         [
-            dbc.Col(dcc.Graph(id=f'static-graph-{fig_index*2}', figure=static_figures_size[fig_index*2])),
-            dbc.Col(dcc.Graph(id=f'static-graph-{fig_index*2 + 1}', figure=static_figures_size[fig_index*2 + 1])),
+            dbc.Col(dcc.Graph(id=f'static-graph-size-{fig_index*2}', figure=static_figures_size[fig_index*2])),
+            dbc.Col(dcc.Graph(id=f'static-graph-size-{fig_index*2 + 1}', figure=static_figures_size[fig_index*2 + 1])),
         ],
         align="center",
     )
